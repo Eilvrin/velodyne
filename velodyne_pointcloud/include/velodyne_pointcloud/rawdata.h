@@ -115,6 +115,36 @@ namespace velodyne_rawdata
     uint8_t status[PACKET_STATUS_SIZE];
   } raw_packet_t;
 
+  inline float packet_interp_time(const uint32_t time) {
+      // Check endiasness
+      int x = 1;
+      char *y = (char*)&x;
+      uint32_t time_hex;
+      if(*y) // Little endian
+      {
+        // Then do nothing, since the time stamp are transmitted least significant byte first.
+        time_hex = time;
+      } else { // Big endian
+        // Then reverse byte order
+        time_hex =  ((time>>24)&0xff)    |   // move byte 3 to byte 0
+                    ((time<<8)&0xff0000) |   // move byte 1 to byte 2
+                    ((time>>8)&0xff00)   |   // move byte 2 to byte 1
+                    ((time<<24)&0xff000000); // byte 0 to byte 3
+      }
+      float time_dec;
+      std::stringstream stream;
+      stream << time_hex;
+      stream >> std::hex >> time_dec;
+      return time_dec;
+    }
+
+  typedef struct raw_packet_vlp16
+  {
+    raw_block_t blocks[BLOCKS_PER_PACKET];
+    uint32_t time;
+    uint8_t return_type;
+    uint8_t data_source;
+  } raw_packet_vlp16_t;
 
   /** \brief Velodyne data conversion class */
   class RawData

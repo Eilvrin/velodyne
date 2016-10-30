@@ -27,6 +27,7 @@
 
 #include <fstream>
 #include <math.h>
+#include <iomanip>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -375,6 +376,13 @@ namespace velodyne_rawdata
     for (size_t packet = 0; packet < scanMsg->packets.size(); ++packet) {
       const velodyne_msgs::VelodynePacket& pkt = scanMsg->packets[packet];
       const raw_packet_t *raw = (const raw_packet_t *) &pkt.data[0];
+
+      const raw_packet_vlp16_t *raw_c = (const raw_packet_vlp16_t *) &pkt.data[0];
+
+
+      ROS_INFO_STREAM("Time Stamp: " << std::setprecision(12) << packet_interp_time(raw_c->time)*1.0e-6);
+      assert(packet_interp_time(raw_c->time) < 3600*1.e6);
+      ROS_INFO_STREAM("Return mode: " << std::hex << +raw_c->return_type << " data source: " << std::hex <<  +raw_c->data_source);
 
       // Read the factory bytes to find out whether the sensor is in dual return mode.
       const bool dual_return = (raw->status[PACKET_STATUS_SIZE-2] == 0x39);

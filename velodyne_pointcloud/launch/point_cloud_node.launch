@@ -1,0 +1,14 @@
+<!-- -*- mode: XML -*- -->
+<launch>
+  <arg name="calibration" default="$(find velodyne_pointcloud)/params/VLP16db.yaml"/>
+  <arg name="min_range" default="0.9" />
+  <arg name="max_range" default="130.0" />
+  <arg name="frame_id" default="odom" />
+  <node pkg="velodyne_pointcloud" type="cloud_node" name="cloud_node" output="screen" >
+    <remap from="velodyne_packets" to="/velodyne/rear/packets"/>
+    <param name="calibration" value="$(arg calibration)"/>
+    <param name="min_range" value="$(arg min_range)"/>
+    <param name="max_range" value="$(arg max_range)"/>
+    <param name="frame_id" value="$(arg frame_id)"/>
+  </node>
+</launch>
