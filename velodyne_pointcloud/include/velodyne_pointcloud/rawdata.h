@@ -141,9 +141,9 @@ namespace velodyne_rawdata
   typedef struct raw_packet_vlp16
   {
     raw_block_t blocks[BLOCKS_PER_PACKET];
-    uint32_t time;
-    uint8_t return_type;
-    uint8_t data_source;
+    uint32_t time;        // Time in microseconds from startup. Probably overshoots each hour.
+    uint8_t return_type;  // 37 - strongest return; 38 - last return; 39 - dual return
+    uint8_t data_source;  // 21 for HDL-32E or 22 for VLP-16
   } raw_packet_vlp16_t;
 
   /** \brief Velodyne data conversion class */
