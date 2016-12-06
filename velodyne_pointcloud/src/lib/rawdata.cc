@@ -53,7 +53,8 @@ namespace velodyne_rawdata
                               double max_range,
                               double view_direction,
                               double view_width,
-                              const std::string& frame_id)
+                              const std::string& frame_id,
+                              const std::string& fixed_frame_id)
   {
     config_.min_range = min_range;
     config_.max_range = max_range;
@@ -76,6 +77,12 @@ namespace velodyne_rawdata
       config_.min_angle = 0;
       config_.max_angle = 36000;
     }
+
+     // Fixed frame id
+    const std::string last_fixed_frame_id = config_.fixed_frame_id;
+    config_.fixed_frame_id = fixed_frame_id;
+    if (!config_.fixed_frame_id.empty() && config_.fixed_frame_id != last_fixed_frame_id)
+        ROS_INFO_STREAM("Fixed frame: " << config_.fixed_frame_id);
 
     // Read new target coordinate frame.
     const std::string last_frame_id = config_.frame_id;
@@ -318,7 +325,7 @@ namespace velodyne_rawdata
                 // If given transform listener, transform point from sensor frame to target frame.
                 geometry_msgs::PointStamped t_point;
                 /// \todo Use the exact beam firing time for transforming points,
-                ///       not the packet receive time.
+                ///       not the packet time.
                 t_point.header.stamp = pkt.stamp; // Sensor pose equals the time of first firing of the first firing sequence in the packet 
                 t_point.header.frame_id = scanMsg->header.frame_id;
                 t_point.point.x = x_coord;
@@ -588,7 +595,7 @@ namespace velodyne_rawdata
               try {
                 ROS_DEBUG_STREAM("transforming from " << t_point.header.frame_id
                                  << " to " << config_.frame_id);
-                tf_listener_->transformPoint(config_.frame_id, t_point, t_point);
+                tf_listener_->transformPoint(config_.frame_id, scanMsg->header.stamp, t_point, config_.fixed_frame_id, t_point);
               } catch (std::exception& ex) {
                 // only log tf error once every second
                 ROS_WARN_THROTTLE(LOG_PERIOD_, "%s", ex.what());

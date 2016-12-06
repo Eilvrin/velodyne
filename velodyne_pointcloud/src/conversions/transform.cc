@@ -56,7 +56,7 @@ namespace velodyne_pointcloud
     tf_filter_->setTargetFrames(std::vector<std::string>(1, frame_id));
     data_->setParameters(config.min_range, config.max_range,
                          config.view_direction, config.view_width,
-                         frame_id);
+                         frame_id, config.fixed_frame_id);
   }
 
 

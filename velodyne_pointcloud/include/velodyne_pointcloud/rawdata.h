@@ -177,7 +177,7 @@ namespace velodyne_rawdata
     void unpack(const velodyne_msgs::VelodyneScan::ConstPtr &scanMsg, VPointCloud &pc);
 
     void setParameters(double min_range, double max_range, double view_direction,
-                       double view_width, const std::string& frame_id = "");
+                       double view_width, const std::string& frame_id = "", const std::string& fixed_frame_id = "");
 
   private:
 
@@ -189,6 +189,7 @@ namespace velodyne_rawdata
       int min_angle;                   ///< minimum angle to publish
       int max_angle;                   ///< maximum angle to publish
       std::string frame_id;            ///< frame into which to transform points
+      std::string fixed_frame_id;     ///<  fixed frame for tf transform
 
       double tmp_min_angle;
       double tmp_max_angle;
