@@ -162,10 +162,10 @@ namespace velodyne_driver
               }
           } while ((fds[0].revents & POLLIN) == 0);
 
-        // Time stamp is set to the end time of packet creation.
-        // ASSUMPTION: The velodyne starts sending the packet after it has been collected completely.
+        // Time stamp is set to the start time of packet creation (time of firing the packet's first beam of the first firing sequence). 
+        // ASSUMPTION: For the VLP-16 the time to accumulate one data packet equals 55.296µs * 24 = 1327.104 µs 
         // We neglect the transfer time. It is handled by the calibration value.
-        pkt->stamp = ros::Time::now() + ros::Duration(time_offset);
+        pkt->stamp = ros::Time::now() - ros::Duration(1327.104*1.0e-6) + ros::Duration(time_offset);
 
         // Receive packets that should now be available from the
         // socket using a blocking read.

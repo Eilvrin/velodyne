@@ -134,6 +134,9 @@ namespace velodyne_rawdata
       return;
     }
 
+    // Convert scan message header to point cloud message header.
+    pc.header.stamp = pcl_conversions::toPCL(scanMsg->header).stamp;
+
     // Define dimensions of the organized output point cloud and fill it with NaN-valued points.
     pc.width  = scanMsg->packets.size() * SCANS_PER_PACKET / calibration_.num_lasers;
     pc.height = calibration_.num_lasers;
@@ -316,7 +319,7 @@ namespace velodyne_rawdata
                 geometry_msgs::PointStamped t_point;
                 /// \todo Use the exact beam firing time for transforming points,
                 ///       not the packet receive time.
-                t_point.header.stamp = pkt.stamp; // Sensor pose equals packet receive time (= end of packet creation + TCP delay).
+                t_point.header.stamp = pkt.stamp; // Sensor pose equals the time of first firing of the first firing sequence in the packet 
                 t_point.header.frame_id = scanMsg->header.frame_id;
                 t_point.point.x = x_coord;
                 t_point.point.y = y_coord;
@@ -356,6 +359,9 @@ namespace velodyne_rawdata
     int azimuth_corrected;
     float x, y, z;
     float intensity;
+
+    // Convert scan message header to point cloud message header.
+    pc.header.stamp = pcl_conversions::toPCL(scanMsg->header).stamp;
 
     // Initialize the organized output point cloud.
     pc.width  = scanMsg->packets.size() * BLOCKS_PER_PACKET * VLP16_FIRINGS_PER_BLOCK;
@@ -570,16 +576,10 @@ namespace velodyne_rawdata
                 continue;
               }
 
-              // Calculate time of firing the packet's first beam in [s].
-              const float pkt_duration = 1.0e-6 *
-                  BLOCKS_PER_PACKET * VLP16_BLOCK_TDURATION;
-              const ros::Time t_pkt_start(pkt.stamp
-                                          - ros::Duration(pkt_duration));
-
               // If given transform listener, transform every single point
               // from sensor frame to target frame.
               geometry_msgs::PointStamped t_point;
-              t_point.header.stamp    = t_pkt_start + ros::Duration(t_beam*1.0e-6);
+              t_point.header.stamp    = pkt.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6);
               t_point.header.frame_id = scanMsg->header.frame_id;
               t_point.point.x         = x_coord;
               t_point.point.y         = y_coord;

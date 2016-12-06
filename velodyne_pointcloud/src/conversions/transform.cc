@@ -70,9 +70,6 @@ namespace velodyne_pointcloud
     // allocate an output point cloud with same time as raw data
     VPointCloud::Ptr outMsg(new VPointCloud());
 
-    // Convert scan message header to point cloud message header.
-    outMsg->header.stamp = pcl_conversions::toPCL(scanMsg->header).stamp;
-
     // unpack the raw data
     data_->unpack(scanMsg, *outMsg);
 
