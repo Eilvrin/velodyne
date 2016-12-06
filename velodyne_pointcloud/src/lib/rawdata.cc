@@ -125,6 +125,8 @@ namespace velodyne_rawdata
 
     tf_listener_ = tf_listener;
 
+    file_.open("azimuth_corrected.txt");
+
     return 0;
   }
 
@@ -444,6 +446,8 @@ namespace velodyne_rawdata
             /** correct for the laser rotation as a function of timing during the firings **/
             azimuth_corrected_f = azimuth + (azimuth_diff * t_beam / VLP16_BLOCK_TDURATION);
             azimuth_corrected = ((int)round(azimuth_corrected_f)) % 36000;
+
+            file_ << pkt.stamp + ros::Duration((block*VLP16_BLOCK_TDURATION+t_beam)*1.0e-6)  << " " << azimuth_corrected <<"\n";
 
             /*condition added to avoid calculating points which are not
               in the interesting defined area (min_angle < area < max_angle)*/

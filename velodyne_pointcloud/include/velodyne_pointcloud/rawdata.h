@@ -25,6 +25,7 @@
 #include <string>
 #include <boost/format.hpp>
 #include <math.h>
+ #include <fstream>
 
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
@@ -204,6 +205,8 @@ namespace velodyne_rawdata
     float cos_rot_table_[ROTATION_MAX_UNITS];
 
     tf::TransformListener* tf_listener_;
+
+    std::ofstream file_;
 
     /** @brief convert raw VLP16 message to point cloud
      *
